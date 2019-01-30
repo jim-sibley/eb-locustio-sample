@@ -34,7 +34,7 @@ class MyTaskSet(TaskSet):
 
 
 class MyLocust(HttpLocust):
-    host = os.getenv('TARGET_URL', "http://localhost")
+    host = os.getenv('TARGET_URL', "http://www.chewy.com")
     task_set = MyTaskSet
     min_wait = 100
     max_wait = 300
