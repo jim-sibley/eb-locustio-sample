@@ -10,14 +10,16 @@
 # License for the specific language governing permissions and limitations under the License.
 
 import os
-import string
-import random
+# import string
+# import random
 from locust import HttpLocust, TaskSet, task
+
 
 class MyTaskSet(TaskSet):
     @task(1000)
     def index(self):
-        response = self.client.get("/")
+        # response = self.client.get("/")
+        self.client.get("/")
 
     # This task will 15 times for every 1000 runs of the above task
     # @task(15)
@@ -30,8 +32,9 @@ class MyTaskSet(TaskSet):
     #     id = id_generator()
     #     self.client.post("/signup", {"email": "example@example.com", "name": "Test"})
 
+
 class MyLocust(HttpLocust):
     host = os.getenv('TARGET_URL', "http://localhost")
     task_set = MyTaskSet
-    min_wait = 45
-    max_wait = 50
+    min_wait = 100
+    max_wait = 300
