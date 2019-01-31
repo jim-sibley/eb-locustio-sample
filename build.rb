@@ -45,22 +45,22 @@ def main
   # will fail the conditional check
   is_master = write_master_ip(master_ip_table, eb_env_name, private_ip, deployment_id)
 
-  puts "We are " + (is_master ? "master" : "follower")
+  puts "We are " + (is_master ? "master" : "slave")
 
   if is_master
     # since this instance is the master, save 127.0.0.1 as the master IP
-    # to be used by the follower processes
+    # to be used by the slave processes
     File.open('.masterIP', "w") { |f| f.print "127.0.0.1" }
 
     # write .foreman file with a single master process and the number of cores
-    # available minus 1 follower processes
-    File.open('.foreman', "w") { |f| f.print "concurrency: locust-master=1,locust-follower=#{num_cores - 1}" }
+    # available minus 1 slave processes
+    File.open('.foreman', "w") { |f| f.print "concurrency: locust-master=1,locust-slave=#{num_cores - 1}" }
   else
-    # since this instance is a follower, get the master IP from the DynamoDB table
+    # since this instance is a slave, get the master IP from the DynamoDB table
     master_ip = get_master_ip(master_ip_table, eb_env_name)
 
     if master_ip
-      # save the master IP to be used by the follower processes
+      # save the master IP to be used by the slave processes
       File.open('.masterIP', "w") { |f| f.print "#{master_ip}" }
 
       # update the nginx.conf to use the master instances IP for upstream
@@ -69,8 +69,8 @@ def main
     end
 
     # write the .foreman file with zero master processes and number of cores
-    # available follower proceses
-    File.open('.foreman', "w") { |f| f.print "concurrency: locust-master=0,locust-follower=#{num_cores}" }
+    # available slave proceses
+    File.open('.foreman', "w") { |f| f.print "concurrency: locust-master=0,locust-slave=#{num_cores}" }
   end
 
   # Recreate the application.conf since we have modified the .foreman file
